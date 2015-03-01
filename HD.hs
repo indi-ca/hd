@@ -28,19 +28,15 @@ main :: IO ()
 main = do
     f <- fileHandler logPath DEBUG
     let myFileHandler' = withFormatter f
-
     updateGlobalLogger "HD" (addHandler f)
-
     updateGlobalLogger "HD" (setLevel DEBUG)
-    debugM "HD" "This is Haskell Development"
+    --debugM "HD" "This is Haskell Development"
 
     c <- runCurses getPalette
     let palette = Palette c
         config = Configuration palette
         initial_buffer = Buffer (0, 2) config "" 0
         initialState = State initial_buffer
-
-    --putStrLn (show palette)
 
     mainLoop initialState initialRender
 
