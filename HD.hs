@@ -12,8 +12,8 @@ import UI.NCurses
 
 import Buffer
 import Proc
-
-
+import Palette
+import Configuration
 
 -- The State
 data State = State {
@@ -34,8 +34,14 @@ main = do
     updateGlobalLogger "HD" (setLevel DEBUG)
     debugM "HD" "This is Haskell Development"
 
-    let initial_buffer = Buffer "" 0
-    let initialState = State initial_buffer
+    c <- runCurses getPalette
+    let palette = Palette c
+        config = Configuration palette
+        initial_buffer = Buffer (0, 2) config "" 0
+        initialState = State initial_buffer
+
+    --putStrLn (show palette)
+
     mainLoop initialState initialRender
 
     close f
@@ -44,6 +50,8 @@ withFormatter :: GenericHandler Handle -> GenericHandler Handle
 withFormatter handler = setFormatter handler formatter
     -- http://hackage.haskell.org/packages/archive/hslogger/1.1.4/doc/html/System-Log-Formatter.html
     where formatter = simpleLogFormatter "[$time $loggername $prio] $msg"
+
+
 
 
 exitFilter :: Event -> Bool
@@ -83,14 +91,14 @@ initialRender = do
     drawString "» "
 
 
--- executing the contents of the buffe
+-- executing the contents of the buffer
 execute :: State -> (State, Update (), IO ())
 execute s = do
     let buffer_contents = contents . buffer $ s
         (b', u') = clearBuffer (buffer s)
         s' = State b'
         io = do
-            (diff, result) <- performTask lego releaseCommand
+            (diff, result) <- performTask motor releaseCommand
             case result of Nothing -> debugM "HD" "Failed"
                            Just (code, str1, str2) -> debugM "HD" str1
     (s', u', io)
