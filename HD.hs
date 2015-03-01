@@ -103,6 +103,7 @@ execute s = do
 updateState :: State -> Event -> (State, Update (), IO ())
 updateState s (EventCharacter c)
     | c == '\n'     = execute s
+    | c == 'c'   = (\x -> (State (fst x), (snd x), return ())) (complete (buffer s) "hello")
     | c == '\DEL'   = (\x -> (State (fst x), (snd x), return ())) (delete (buffer s))
     | otherwise     = (\x -> (State (fst x), (snd x), return ())) (insert (buffer s) c)
 

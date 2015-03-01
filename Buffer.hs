@@ -1,11 +1,12 @@
 module Buffer (
       Buffer(..),
       insert, delete, clearBuffer,
+      complete
     ) where
 
 import UI.NCurses
 import Configuration
-
+import Palette
 
 data Buffer = Buffer {
     context :: (Integer, Integer),
@@ -53,7 +54,11 @@ clearBuffer b = if emptyBuffer b then (b, return ())
 --setTwo :: Buffer -> Update ()
 --setTwo b = setColor ( (last . colours . config) b )
 
---complete :: Buffer -> String -> (Buffer, Update ())
---complete b str = (b, (moveCursor' 0) >> (setTwo b >> (drawString str) >> setOne b  )  )
-
+complete :: Buffer -> String -> (Buffer, Update ())
+complete b str = (b, do
+    moveCursor' b 5
+    setColor (acColor ((palette . config $ b)))
+    drawString str
+    setColor (normalColor (palette . config $ b))
+    )
 

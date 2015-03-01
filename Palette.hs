@@ -1,4 +1,7 @@
-module Palette (getPalette, Palette(..) ) where
+module Palette (
+    getPalette, Palette(..),
+    acColor, normalColor
+    ) where
 
 import UI.NCurses
 
@@ -14,7 +17,6 @@ import UI.NCurses
 --ColorDefault
 
 
-
 data Palette = Palette {
     colors :: [ColorID]
 } deriving Show
@@ -22,5 +24,11 @@ data Palette = Palette {
 
 -- TODO: Change this so that it returns a recipie to make the type Palette
 getPalette :: Curses [ColorID]
-getPalette = sequence [newColorID ColorBlue ColorDefault 1, newColorID ColorBlue ColorDefault 2]
+getPalette = sequence [newColorID ColorDefault ColorDefault 1, newColorID ColorBlue ColorDefault 2]
 
+
+normalColor :: Palette -> ColorID
+normalColor p = (colors p) !! 0
+
+acColor :: Palette -> ColorID
+acColor p = (colors p) !! 1
