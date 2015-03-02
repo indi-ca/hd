@@ -1,7 +1,7 @@
 module Buffer (
       Buffer(..),
       insert, delete, clearBuffer,
-      complete
+      complete, acceptCompletion
     ) where
 
 import UI.NCurses
@@ -20,10 +20,7 @@ moveCursor' :: Buffer -> Integer -> Update ()
 moveCursor' b x = moveCursor (fst . context $  b) ((snd . context $ b) + x)
 
 
---TODO: How do I create a new Buffer, but just modify one item?
 --TODO: Ofcourse, both insert and delete fail the cursor is not at the end
---I would have to pass in the contextual position of the buffer
-
 insert :: Buffer -> Char -> (Buffer, Update ())
 insert b c = (b', (drawString [c]) >> (moveCursor' b newPos))
     where b' = b { contents = newContents, cursorPos = newPos}
@@ -47,18 +44,15 @@ clearBuffer b = if emptyBuffer b then (b, return ())
           empties = (replicate . length . contents) b ' '
 
 
-
---setOne :: Buffer -> Update ()
---setOne b = setColor ( (head . colours . config) b )
-
---setTwo :: Buffer -> Update ()
---setTwo b = setColor ( (last . colours . config) b )
-
 complete :: Buffer -> String -> (Buffer, Update ())
 complete b str = (b, do
-    moveCursor' b 5
+    moveCursor' b (cursorPos b)
     setColor (acColor ((palette . config $ b)))
     drawString str
     setColor (normalColor (palette . config $ b))
+    moveCursor' b (cursorPos b)
     )
 
+
+acceptCompletion :: Buffer -> (Buffer, Update ())
+acceptCompletion b = (b, return ())

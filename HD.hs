@@ -77,7 +77,16 @@ renderState u = do
     updateWindow w $ u
     render
     e <- getInput w
+    debugBuffer w e
+    render
     return e
+
+
+debugBuffer :: Window -> Event -> Curses ()
+debugBuffer w e = do
+    updateWindow w $ do
+        moveCursor 10 0
+        drawString $ show e
 
 
 
@@ -103,8 +112,9 @@ execute s = do
 updateState :: State -> Event -> (State, Update (), IO ())
 updateState s (EventCharacter c)
     | c == '\n'     = execute s
-    | c == 'c'   = (\x -> (State (fst x), (snd x), return ())) (complete (buffer s) "hello")
+    | c == 'c'      = (\x -> (State (fst x), (snd x), return ())) (complete (buffer s) "hello")
     | c == '\DEL'   = (\x -> (State (fst x), (snd x), return ())) (delete (buffer s))
+    | c == '\t'     = (\x -> (State (fst x), (snd x), return ())) (acceptCompletion (buffer s))
     | otherwise     = (\x -> (State (fst x), (snd x), return ())) (insert (buffer s) c)
 
 
