@@ -1,4 +1,4 @@
-module Autocomplete (basicComplete) where
+module Autocomplete (getCompletion) where
 
 
 import Data.List (elemIndex)
@@ -19,3 +19,6 @@ startsWith _ [] = False
 startsWith a b = and $ zipWith (==) a b
 
 
+getCompletion :: String -> String
+getCompletion s = case basicComplete completions s of Nothing -> ""
+                                                      Just x -> drop (length s) x

@@ -10,6 +10,7 @@ import System.Log.Handler (setFormatter, close)
 import System.Log.Formatter
 import UI.NCurses
 
+import Autocomplete
 import Buffer
 import Proc
 import Palette
@@ -31,6 +32,11 @@ main = do
     updateGlobalLogger "HD" (addHandler f)
     updateGlobalLogger "HD" (setLevel DEBUG)
     --debugM "HD" "This is Haskell Development"
+
+    (x, y) <- runCurses screenSize
+    putStrLn $ show x -- rows
+    putStrLn $ show y -- columns
+
 
     c <- runCurses getPalette
     let palette = Palette c
@@ -93,6 +99,8 @@ debugBuffer w e = do
 initialRender :: Update ()
 initialRender = do
     moveCursor 0 0
+    clearScreen 10 10
+    moveCursor 0 0
     drawString "» "
 
 
@@ -112,11 +120,21 @@ execute s = do
 updateState :: State -> Event -> (State, Update (), IO ())
 updateState s (EventCharacter c)
     | c == '\n'     = execute s
-    | c == 'c'      = (\x -> (State (fst x), (snd x), return ())) (complete (buffer s) "hello")
+    | c == 'c'      = (\x -> (State (fst x), (snd x), return ())) (complete (buffer s) (getCompletion (contents . buffer $ s)))
     | c == '\DEL'   = (\x -> (State (fst x), (snd x), return ())) (delete (buffer s))
     | c == '\t'     = (\x -> (State (fst x), (snd x), return ())) (acceptCompletion (buffer s))
     | otherwise     = (\x -> (State (fst x), (snd x), return ())) (insert (buffer s) c)
 
 
+-- Too drunk. This should probably be Update ()
+-- rows, columns
+clearScreen :: Integer -> Integer -> Update ()
+clearScreen x y = drawString "            "
+
+--clearScreen x y = sequence (map line [0..x])
+--    where line a = (moveCursor a 0) >> (drawString $ replicate (fromIntegral y) 'x')
+
+-- I need to move the cursor
+-- and draw a string
 
 

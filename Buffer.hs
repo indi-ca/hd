@@ -22,7 +22,7 @@ moveCursor' b x = moveCursor (fst . context $  b) ((snd . context $ b) + x)
 
 --TODO: Ofcourse, both insert and delete fail the cursor is not at the end
 insert :: Buffer -> Char -> (Buffer, Update ())
-insert b c = (b', (drawString [c]) >> (moveCursor' b newPos))
+insert b c = (b', (moveCursor' b (cursorPos b)) >> (drawString [c]) >> (moveCursor' b newPos))
     where b' = b { contents = newContents, cursorPos = newPos}
           newPos = cursorPos b + 1
           newContents = contents b ++ [c]
